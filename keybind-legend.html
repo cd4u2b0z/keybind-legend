@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Keybind Legend — Corsair K100</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #2D353B;
+    --bg-deep: color-mix(in srgb, #2D353B 40%, black);
+    --bg-surface: #343F44;
+    --fg: #D3C6AA;
+    --fg-dim: #5C6A72;
+    --border: color-mix(in srgb, #5C6A72 50%, transparent);
+    --accent: #83C092;
+    --mod-super: #7FBBB3;
+    --mod-super-shift: #E67E80;
+    --mod-super-ctrl: #D699B6;
+    --mod-super-alt: #A7C080;
+    --mod-ctrl: #3A94C5;
+    --mod-ctrl-alt: #F85552;
+    --mod-bare: #DBBC7F;
+    --mod-super-alt-shift: #DF69BA;
+    --mod-super-ctrl-shift: #DFA000;
+    --u: 42px;
+    --gap: 3px;
+    --radius-key: 5px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-key: 0 1px 0 1px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.2);
+    --shadow-key-hover: 0 1px 0 1px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.3);
+    --shadow-key-pressed: 0 0 0 1px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.15);
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --mono: 'JetBrainsMono Nerd Font Mono','JetBrainsMono NFM','JetBrains Mono',monospace;
+    --sans: 'Inter',system-ui,-apple-system,sans-serif;
+  }
+
+  body { background:var(--bg-deep); color:var(--fg); font-family:var(--sans); min-height:100vh; user-select:none; }
+
+  /* ── Layout ── */
+  .container { max-width:1520px; margin:0 auto; padding:24px 24px; }
+  .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .header h1 { font-family:var(--mono); font-size:0.85rem; font-weight:700; letter-spacing:0.14em; color:var(--accent); text-transform:uppercase; }
+  .header .subtitle { font-size:0.6rem; color:var(--fg-dim); margin-top:3px; letter-spacing:0.03em; }
+  .header-right { display:flex; gap:8px; align-items:center; }
+
+  /* Stats bar */
+  .stats-bar { display:flex; gap:14px; align-items:center; font-family:var(--mono); font-size:0.55rem; color:var(--fg-dim); letter-spacing:0.03em; }
+  .stats-bar .stat { display:flex; align-items:center; gap:4px; }
+  .stats-bar .stat-val { color:var(--accent); font-weight:700; }
+  .stats-bar .stat-conflict { color:var(--mod-super-shift); }
+
+  /* View toggle */
+  .view-toggle { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:7px 14px; color:var(--fg-dim); font-family:var(--mono); font-size:0.62rem; font-weight:600; cursor:pointer; transition:all var(--transition-fast); letter-spacing:0.04em; }
+  .view-toggle:hover { border-color:var(--accent); color:var(--fg); }
+  .view-toggle.active { background:var(--accent); color:var(--bg-deep); border-color:var(--accent); }
+
+  /* Search */
+  .search-box { position:relative; }
+  .search-box input { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:7px 12px 7px 30px; color:var(--fg); font-family:var(--mono); font-size:0.7rem; width:220px; outline:none; transition:all var(--transition-base); }
+  .search-box input:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent); }
+  .search-box input::placeholder { color:var(--fg-dim); font-family:var(--sans); }
+  .search-box::before { content:'⌕'; position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--fg-dim); font-size:0.85rem; pointer-events:none; }
+
+  /* Settings */
+  .settings-btn { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--fg-dim); font-size:0.85rem; transition:all var(--transition-fast); position:relative; }
+  .settings-btn:hover { border-color:var(--accent); color:var(--fg); }
+  .settings-menu { display:none; position:absolute; top:40px; right:0; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:12px 16px; min-width:200px; z-index:50; box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .settings-menu.open { display:block; }
+  .settings-menu label { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.7rem; color:var(--fg); padding:6px 0; cursor:pointer; font-family:var(--sans); }
+  .settings-menu input[type=checkbox] { accent-color:var(--accent); width:15px; height:15px; }
+
+  /* ── Filters ── */
+  .filters { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .filter-row { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+  .filter-label { font-family:var(--mono); font-size:0.55rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--fg-dim); min-width:70px; }
+  .chip { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:9999px; border:1px solid var(--border); background:transparent; color:var(--fg-dim); font-family:var(--sans); font-size:0.62rem; font-weight:500; cursor:pointer; transition:all var(--transition-fast); white-space:nowrap; }
+  .chip:hover { border-color:var(--fg); color:var(--fg); background:color-mix(in srgb,var(--bg-surface) 60%,transparent); }
+  .chip.active { color:var(--bg-deep); border-color:transparent; font-weight:700; }
+  .chip .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .chip .count { font-family:var(--mono); font-size:0.5rem; opacity:0.6; }
+
+  /* ── Main layout ── */
+  .main { display:flex; gap:16px; align-items:flex-start; }
+  .keyboard-wrap { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; }
+
+  /* ── Viewport scaling ── */
+  .keyboard-scaler { transform-origin:top center; width:fit-content; }
+
+  /* ── Keyboard chassis ── */
+  .keyboard {
+    display:flex; flex-direction:column; width:fit-content;
+    background: linear-gradient(180deg, color-mix(in srgb,var(--bg) 92%,white) 0%, var(--bg) 6%, color-mix(in srgb,var(--bg) 94%,black) 100%);
+    border-radius:var(--radius-xl); border:1px solid color-mix(in srgb,var(--fg-dim) 18%,transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb,var(--fg-dim) 8%,transparent), 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 color-mix(in srgb,var(--fg-dim) 6%,transparent);
+    overflow:hidden;
+  }
+  .kb-body { display:flex; gap:0; }
+
+  /* ── Left section: G1-G6 macros ── */
+  .kb-left {
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:var(--gap);
+    padding:12px 6px 12px 10px;
+    border-right:1px solid color-mix(in srgb,var(--fg-dim) 10%,transparent);
+  }
+  .kb-macros { display:flex; flex-direction:column; gap:var(--gap); }
+
+  /* ── Center: main keyboard ── */
+  .kb-center { display:flex; flex-direction:column; gap:var(--gap); padding:12px 10px; }
+  .kb-row { display:flex; gap:var(--gap); }
+  .kb-gap { flex-shrink:0; }
+
+  /* ── Right section: numpad ── */
+  .kb-right {
+    display:flex; flex-direction:column; gap:var(--gap); align-items:stretch;
+    padding:12px 10px 12px 6px;
+    border-left:1px solid color-mix(in srgb,var(--fg-dim) 10%,transparent);
+  }
+  .numpad-spacer { height:calc(var(--u) + var(--gap)); }
+
+  /* ── Nav cluster: navigation + arrow keys ── */
+  .kb-nav {
+    display:grid;
+    grid-template-columns: repeat(3, var(--u));
+    grid-auto-rows: var(--u);
+    gap: var(--gap);
+    padding: 12px 10px;
+    align-content: start;
+  }
+
+  /* Numpad */
+  .kb-numpad { display:grid; grid-template-columns:repeat(4,var(--u)); grid-template-rows:repeat(5,var(--u)); gap:var(--gap); }
+
+  /* ── Top bezel ── */
+  .kb-bezel {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    padding:10px 14px 8px 14px;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 95%,white),color-mix(in srgb,var(--bg) 98%,black));
+    border-bottom:1px solid color-mix(in srgb,var(--fg-dim) 8%,transparent);
+  }
+
+  /* Bezel left: [Profile btn] [iCUE wheel] [Win Lock btn] */
+  .bezel-left { display:flex; align-items:center; gap:6px; }
+
+  .bezel-btn {
+    width:18px; height:18px; border-radius:3px; flex-shrink:0;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg-surface) 95%,white),var(--bg-surface));
+    border:1px solid color-mix(in srgb,var(--fg-dim) 20%,transparent);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:0.6rem; color:var(--fg-dim); cursor:default;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  .icue-wheel {
+    width:44px; height:44px; border-radius:50%; position:relative; flex-shrink:0;
+    background:radial-gradient(circle at 35% 35%,color-mix(in srgb,var(--bg-surface) 95%,white),var(--bg-surface) 70%,color-mix(in srgb,var(--bg-surface) 85%,black));
+    border:2px solid color-mix(in srgb,var(--fg-dim) 25%,transparent);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent), 0 2px 8px rgba(0,0,0,0.4);
+    cursor:pointer; transition:all var(--transition-base);
+  }
+  .icue-wheel:hover { box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 40%,transparent), 0 2px 12px rgba(0,0,0,0.5); }
+  .icue-wheel::before { content:''; position:absolute; inset:5px; border-radius:50%; border:1px solid color-mix(in srgb,var(--fg-dim) 20%,transparent); background:radial-gradient(circle at 40% 40%,color-mix(in srgb,var(--bg-surface) 92%,white),var(--bg-surface)); }
+  .icue-wheel::after { content:''; position:absolute; width:2px; height:7px; background:var(--accent); top:7px; left:50%; transform:translateX(-50%); border-radius:1px; z-index:1; }
+
+  /* Bezel right: top row [Mute] [Vol roller], bottom row [Stop] [Prev] [Play] [Next] */
+  .bezel-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+  .bezel-right-top { display:flex; align-items:center; gap:4px; }
+  .bezel-right-bottom { display:flex; align-items:center; gap:3px; }
+
+  .mute-btn {
+    width:18px; height:18px; border-radius:3px; flex-shrink:0;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg-surface) 95%,white),var(--bg-surface));
+    border:1px solid color-mix(in srgb,var(--fg-dim) 20%,transparent);
+    display:flex; align-items:center; justify-content:center; cursor:default;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+    font-family:var(--mono); font-size:0.55rem; color:var(--fg-dim);
+  }
+
+  .vol-roller {
+    width:56px; height:12px; border-radius:6px; position:relative; overflow:hidden; cursor:default; flex-shrink:0;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg-surface) 82%,white),var(--bg-surface),color-mix(in srgb,var(--bg-surface) 88%,black));
+    border:1px solid color-mix(in srgb,var(--fg-dim) 25%,transparent);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,0.25), 0 1px 0 color-mix(in srgb,var(--fg-dim) 8%,transparent);
+  }
+  .vol-roller::before { content:''; position:absolute; inset:2px 4px; background:repeating-linear-gradient(90deg,transparent,transparent 2px,color-mix(in srgb,var(--fg-dim) 12%,transparent) 2px,color-mix(in srgb,var(--fg-dim) 12%,transparent) 3px); border-radius:2px; }
+
+  .media-btn {
+    height:18px; width:18px; border-radius:3px; flex-shrink:0;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg-surface) 95%,white),var(--bg-surface));
+    border:1px solid color-mix(in srgb,var(--fg-dim) 20%,transparent);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:0.55rem;
+    color:var(--fg-dim); cursor:default;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  /* ── Keys ── */
+  .key {
+    --bind-color:var(--fg-dim);
+    height:var(--u); min-width:var(--u); border-radius:var(--radius-key);
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bg-surface) 96%,white),var(--bg-surface));
+    border:1px solid color-mix(in srgb,var(--fg-dim) 20%,transparent);
+    border-bottom:2px solid color-mix(in srgb,var(--fg-dim) 15%,black);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative; cursor:default;
+    transition:all var(--transition-fast); padding:1px 2px; flex-shrink:0;
+    box-shadow:var(--shadow-key);
+  }
+  .key:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .key .label { font-family:var(--mono); font-size:0.52rem; font-weight:600; color:var(--fg-dim); transition:color var(--transition-fast); line-height:1; }
+  .key .binding-preview { font-size:0.36rem; font-weight:500; color:transparent; transition:color var(--transition-fast); line-height:1; text-align:center; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px; }
+  .key.macro { background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 8%,var(--bg-surface)),color-mix(in srgb,var(--accent) 4%,var(--bg-surface))); border-color:color-mix(in srgb,var(--accent) 20%,var(--border)); }
+  .key.macro .label { color:var(--accent); font-size:0.46rem; }
+  .key.dimmed { opacity:0.15; transition:opacity var(--transition-fast); }
+  .key.bound {
+    border-color:color-mix(in srgb,var(--bind-color) 40%,transparent);
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bind-color) 10%,var(--bg-surface)),color-mix(in srgb,var(--bind-color) 5%,var(--bg-surface)));
+    box-shadow:var(--shadow-key), 0 0 8px color-mix(in srgb,var(--bind-color) 10%,transparent);
+  }
+  .key.bound .label { color:var(--fg); }
+  .key.bound .binding-preview { color:color-mix(in srgb,var(--bind-color) 85%,var(--fg)); }
+  .key.bound:hover, .key.selected {
+    background:linear-gradient(180deg,color-mix(in srgb,var(--bind-color) 18%,var(--bg-surface)),color-mix(in srgb,var(--bind-color) 10%,var(--bg-surface)));
+    box-shadow:var(--shadow-key-hover), 0 0 16px color-mix(in srgb,var(--bind-color) 20%,transparent);
+    transform:translateY(-1px); border-bottom-width:1px;
+  }
+  .key.pressed {
+    transform:translateY(2px) !important; border-bottom-width:1px !important;
+    box-shadow:var(--shadow-key-pressed) !important;
+    transition:all 80ms ease !important;
+  }
+  .key.selected { outline:2px solid var(--bind-color); outline-offset:1px; }
+  .key .multi-dots { position:absolute; bottom:2px; right:3px; display:flex; gap:1.5px; }
+  .key .multi-dots .md { width:3px; height:3px; border-radius:50%; }
+
+  /* Conflict dot */
+  .conflict-dot { position:absolute; top:3px; left:3px; width:5px; height:5px; border-radius:50%; background:var(--mod-super-shift); animation:conflict-pulse 2s ease-in-out infinite; z-index:2; }
+  @keyframes conflict-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+  /* Setting toggles */
+  body.hide-previews .binding-preview { display:none !important; }
+  body.hide-glow .key.bound { box-shadow:var(--shadow-key) !important; }
+  body.hide-glow .key.bound:hover, body.hide-glow .key.selected { box-shadow:var(--shadow-key-hover) !important; }
+
+  /* ── Detail panel — frosted glass ── */
+  .detail-panel { width:270px; flex-shrink:0; background:color-mix(in srgb,var(--bg) 75%,transparent); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; position:sticky; top:24px; transition:opacity var(--transition-base); }
+  .detail-panel.empty { opacity:0.3; }
+  .detail-panel .dp-hint { text-align:center; color:var(--fg-dim); font-size:0.65rem; padding:36px 0; }
+  .detail-panel .dp-key-name { font-family:var(--mono); font-size:1.3rem; font-weight:800; color:var(--fg); margin-bottom:2px; }
+  .detail-panel .dp-key-sub { font-size:0.58rem; color:var(--fg-dim); margin-bottom:12px; font-weight:500; }
+  .dp-binding { margin-bottom:8px; padding:8px 10px; border-radius:var(--radius-md); background:color-mix(in srgb,var(--bg-deep) 50%,var(--bg)); border-left:3px solid var(--entry-color,var(--fg-dim)); position:relative; }
+  .dp-binding .dp-mod { font-family:var(--mono); font-size:0.55rem; font-weight:700; letter-spacing:0.04em; margin-bottom:3px; }
+  .dp-binding .dp-desc { font-size:0.75rem; font-weight:600; color:var(--fg); margin-bottom:2px; padding-right:24px; }
+  .dp-binding .dp-category { font-size:0.5rem; color:var(--fg-dim); font-style:italic; }
+
+  /* Copy button in detail panel */
+  .dp-copy { position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:4px; border:1px solid var(--border); background:transparent; color:var(--fg-dim); font-size:0.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all var(--transition-fast); padding:0; line-height:1; }
+  .dp-copy:hover { border-color:var(--accent); color:var(--accent); }
+  .dp-copy.copied { border-color:var(--mod-super-alt); color:var(--mod-super-alt); }
+
+  /* ── Hover tooltip ── */
+  .hover-tip { position:fixed; z-index:100; background:color-mix(in srgb,var(--bg) 92%,transparent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:var(--radius-md); padding:6px 10px; font-family:var(--mono); font-size:0.58rem; color:var(--fg); pointer-events:none; opacity:0; transition:opacity 120ms ease; max-width:260px; box-shadow:0 4px 16px rgba(0,0,0,0.3); white-space:pre-line; }
+  .hover-tip.visible { opacity:1; }
+
+  /* ── Modifier held indicator ── */
+  .mod-held-indicator { position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:200; background:var(--accent); color:var(--bg-deep); font-family:var(--mono); font-size:0.65rem; font-weight:700; padding:6px 18px; border-radius:9999px; opacity:0; transition:opacity 150ms ease; pointer-events:none; letter-spacing:0.06em; box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+  .mod-held-indicator.visible { opacity:1; }
+
+  /* ── Cheat sheet ── */
+  .cheat-sheet { column-count:3; column-gap:16px; padding:16px 0; }
+  @media(max-width:1100px){ .cheat-sheet{column-count:2;} }
+  @media(max-width:700px){ .cheat-sheet{column-count:1;} }
+  .cs-category { break-inside:avoid; margin-bottom:14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:12px 14px; }
+  .cs-category h3 { font-family:var(--mono); font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+  .cs-item { display:flex; align-items:baseline; gap:8px; padding:3px 0; font-size:0.62rem; border-bottom:1px solid color-mix(in srgb,var(--border) 40%,transparent); }
+  .cs-item:last-child { border-bottom:none; }
+  .cs-item .cs-keys { font-family:var(--mono); font-weight:600; white-space:nowrap; flex-shrink:0; min-width:120px; }
+  .cs-item .cs-desc { color:var(--fg); }
+
+  /* ── Overflow media keys ── */
+  .media-section { margin-top:14px; }
+  .media-section h2 { font-family:var(--mono); font-size:0.58rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--fg-dim); margin-bottom:8px; }
+  .media-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:4px; }
+  .media-item { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:var(--radius-md); background:var(--bg); border:1px solid var(--border); font-size:0.62rem; }
+  .media-item .mi-key { font-family:var(--mono); font-weight:600; white-space:nowrap; flex-shrink:0; }
+  .media-item .mi-desc { color:var(--fg); }
+
+  .footer { text-align:center; margin-top:18px; font-size:0.5rem; color:var(--fg-dim); letter-spacing:0.04em; }
+
+  /* ── Print layout ── */
+  @media print {
+    body { background:white !important; color:black !important; }
+    .container { max-width:100%; padding:0; }
+    .header-right, .filters, .settings-btn, .search-box, .view-toggle, .hover-tip, .mod-held-indicator, .footer, .media-section { display:none !important; }
+    .main { display:none !important; }
+    .cheat-sheet { display:block !important; column-count:3; color:black; }
+    .cs-category { border:1px solid #ccc; background:white; }
+    .cs-category h3 { color:black; }
+    .cs-item .cs-keys { color:#333; }
+    .cs-item .cs-desc { color:black; }
+    .cs-item { border-bottom-color:#eee; }
+    .stats-bar { display:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>Keybind Legend</h1>
+      <div class="subtitle">Corsair K100 &mdash; auto-generated from hyprland.conf</div>
+    </div>
+    <div class="header-right">
+      <div class="stats-bar" id="statsBar"></div>
+      <button class="view-toggle" id="viewToggle">List View</button>
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search bindings..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="settings-btn" id="settingsBtn" title="Settings">⚙
+        <div class="settings-menu" id="settingsMenu">
+          <label>Key previews <input type="checkbox" id="optPreviews" checked></label>
+          <label>Glow effects <input type="checkbox" id="optGlow" checked></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-row"><span class="filter-label">Layer</span><div id="modChips"></div></div>
+    <div class="filter-row"><span class="filter-label">Category</span><div id="catChips"></div></div>
+  </div>
+
+  <div class="main" id="mainView">
+    <div class="keyboard-wrap">
+      <div class="keyboard-scaler" id="keyboardScaler">
+        <div class="keyboard" id="keyboard">
+          <div class="kb-bezel" id="bezel"></div>
+          <div class="kb-body" id="kbBody"></div>
+        </div>
+      </div>
+      <div class="media-section" id="mediaSection"></div>
+    </div>
+    <div class="detail-panel empty" id="detailPanel">
+      <div class="dp-hint">Click a key to inspect its bindings</div>
+    </div>
+  </div>
+  <div class="cheat-sheet" id="cheatSheet" style="display:none"></div>
+  <div class="footer">Super+F1 &middot; Parsed from hyprland.conf</div>
+</div>
+<div class="hover-tip" id="hoverTip"></div>
+<div class="mod-held-indicator" id="modIndicator"></div>
+
+<script>
+const RAW_BINDINGS = [{"mods":"SUPER","key":"q","dispatcher":"killactive","args":"","comment":"Close active window","category":"General"},{"mods":"SUPER","key":"t","dispatcher":"exec","args":"kitty","comment":"Open terminal (kitty)","category":"General"},{"mods":"SUPER","key":"return","dispatcher":"exec","args":"kitty","comment":"Open terminal (kitty) - alternative","category":"General"},{"mods":"SUPER","key":"m","dispatcher":"exit","args":"","comment":"","category":"General"},{"mods":"SUPER","key":"e","dispatcher":"exec","args":"thunar","comment":"","category":"General"},{"mods":"SUPER","key":"v","dispatcher":"togglefloating","args":"","comment":"","category":"General"},{"mods":"SUPER","key":"r","dispatcher":"exec","args":"fuzzel","comment":"","category":"General"},{"mods":"SUPER","key":"p","dispatcher":"pseudo","args":"","comment":"dwindle","category":"General"},{"mods":"SUPER","key":"backslash","dispatcher":"togglesplit","args":"","comment":"dwindle (moved from J to free vim keys)","category":"General"},{"mods":"SUPER","key":"f","dispatcher":"fullscreen","args":"1","comment":"Maximize (keeps address bar & borders)","category":"General"},{"mods":"SHIFT+SUPER","key":"f","dispatcher":"fullscreen","args":"0","comment":"True fullscreen (hides everything)","category":"General"},{"mods":"SUPER","key":"tab","dispatcher":"cyclenext","args":"","comment":"","category":"General"},{"mods":"SHIFT+SUPER","key":"tab","dispatcher":"cyclenext","args":"prev","comment":"","category":"General"},{"mods":"ALT+SUPER","key":"f","dispatcher":"togglefloating","args":"","comment":"Toggle floating/tiling","category":"WINDOW SIZE MANAGEMENT ───"},{"mods":"CTRL+SUPER","key":"f","dispatcher":"fullscreen","args":"1","comment":"Toggle maximize","category":"WINDOW SIZE MANAGEMENT ───"},{"mods":"SUPER","key":"u","dispatcher":"centerwindow","args":"","comment":"Center floating window","category":"WINDOW SIZE MANAGEMENT ───"},{"mods":"SHIFT+SUPER","key":"u","dispatcher":"resizeactive","args":"exact 1920 1080","comment":"Resize to standard HD size","category":"WINDOW SIZE MANAGEMENT ───"},{"mods":"CTRL+SUPER","key":"u","dispatcher":"resizeactive","args":"exact 1400 900","comment":"Resize to smaller window","category":"WINDOW SIZE MANAGEMENT ───"},{"mods":"CTRL","key":"minus","dispatcher":"exec","args":"~/.config/hypr/scripts/simple-transparency.sh decrease","comment":"Decrease opacity (Ctrl + -)","category":"WINDOW TRANSPARENCY ───"},{"mods":"CTRL","key":"equal","dispatcher":"exec","args":"~/.config/hypr/scripts/simple-transparency.sh increase","comment":"Increase opacity (Ctrl + =)","category":"WINDOW TRANSPARENCY ───"},{"mods":"SHIFT+SUPER","key":"t","dispatcher":"exec","args":"~/.config/hypr/scripts/toggle-transparency.sh","comment":"Toggle transparency on/off (Super + Shift + T)","category":"WINDOW TRANSPARENCY ───"},{"mods":"SUPER","key":"space","dispatcher":"exec","args":"~/.config/hypr/scripts/command-palette.sh","comment":"","category":"FUZZEL POWER TOOLS ───"},{"mods":"ALT+SUPER","key":"tab","dispatcher":"exec","args":"~/.config/hypr/scripts/window-switcher.sh","comment":"","category":"FUZZEL POWER TOOLS ───"},{"mods":"ALT+SUPER","key":"p","dispatcher":"exec","args":"~/.config/hypr/scripts/project-switcher.sh","comment":"","category":"FUZZEL POWER TOOLS ───"},{"mods":"SUPER","key":"f1","dispatcher":"exec","args":"~/.config/hypr/scripts/keybind-legend.sh","comment":"","category":"FUZZEL POWER TOOLS ───"},{"mods":"SUPER","key":"b","dispatcher":"exec","args":"librewolf","comment":"","category":"APPLICATIONS ───"},{"mods":"SHIFT+SUPER","key":"b","dispatcher":"exec","args":"brave","comment":"","category":"APPLICATIONS ───"},{"mods":"ALT+SUPER","key":"b","dispatcher":"exec","args":"brave","comment":"Brave browser (alt)","category":"APPLICATIONS ───"},{"mods":"SUPER","key":"c","dispatcher":"exec","args":"code","comment":"","category":"APPLICATIONS ───"},{"mods":"SHIFT+SUPER","key":"c","dispatcher":"exec","args":"kitty -e btop","comment":"","category":"APPLICATIONS ───"},{"mods":"ALT+SUPER","key":"d","dispatcher":"exec","args":"refresh-picker","comment":"Quick refresh rate picker","category":"APPLICATIONS ───"},{"mods":"ALT+SUPER","key":"e","dispatcher":"exec","args":"thunar","comment":"File manager (alt)","category":"APPLICATIONS ───"},{"mods":"ALT+SHIFT+SUPER","key":"e","dispatcher":"exec","args":"nwg-look","comment":"Modern theme manager","category":"APPLICATIONS ───"},{"mods":"CTRL+SUPER","key":"e","dispatcher":"exec","args":"lxappearance","comment":"Classic theme manager","category":"APPLICATIONS ───"},{"mods":"CTRL+SUPER","key":"t","dispatcher":"exec","args":"/home/craig/.local/bin/apply-dark-theme && notify-send Theme Applied Nord Dark theme activated","comment":"","category":"APPLICATIONS ───"},{"mods":"SHIFT+SUPER","key":"y","dispatcher":"exec","args":"/home/craig/.local/bin/theme-check","comment":"","category":"APPLICATIONS ───"},{"mods":"SUPER","key":"g","dispatcher":"exec","args":"steam","comment":"","category":"APPLICATIONS ───"},{"mods":"SHIFT+SUPER","key":"g","dispatcher":"exec","args":"lutris","comment":"","category":"APPLICATIONS ───"},{"mods":"SUPER","key":"period","dispatcher":"exec","args":"kitty -e fastfetch","comment":"","category":"APPLICATIONS ───"},{"mods":"SUPER","key":"comma","dispatcher":"exec","args":"kitty -e btop","comment":"","category":"APPLICATIONS ───"},{"mods":"","key":"print","dispatcher":"exec","args":"~/.local/bin/screenshots/fullscreen-screenshot","comment":"","category":"SCREENSHOTS ───"},{"mods":"SUPER","key":"print","dispatcher":"exec","args":"~/.local/bin/screenshots/area-screenshot","comment":"","category":"SCREENSHOTS ───"},{"mods":"SHIFT+SUPER","key":"print","dispatcher":"exec","args":"~/.local/bin/screenshots/window-screenshot","comment":"","category":"SCREENSHOTS ───"},{"mods":"CTRL","key":"print","dispatcher":"exec","args":"grim - | wl-copy","comment":"","category":"SCREENSHOTS ───"},{"mods":"CTRL+SUPER","key":"print","dispatcher":"exec","args":"grim -g $(slurp) - | wl-copy","comment":"","category":"SCREENSHOTS ───"},{"mods":"","key":"xf86audioraisevolume","dispatcher":"exec","args":"~/.config/hypr/scripts/volume-up.sh","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audiolowervolume","dispatcher":"exec","args":"pactl set-sink-volume @DEFAULT_SINK@ -5%","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audiomute","dispatcher":"exec","args":"pactl set-sink-mute @DEFAULT_SINK@ toggle","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audiomicmute","dispatcher":"exec","args":"pactl set-source-mute @DEFAULT_SOURCE@ toggle","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"SUPER","key":"equal","dispatcher":"exec","args":"pamixer -i 5","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"SUPER","key":"minus","dispatcher":"exec","args":"pamixer -d 5","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"SUPER","key":"0","dispatcher":"exec","args":"pamixer -t","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audioplay","dispatcher":"exec","args":"playerctl play-pause","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audiopause","dispatcher":"exec","args":"playerctl play-pause","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audionext","dispatcher":"exec","args":"playerctl next","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"","key":"xf86audioprev","dispatcher":"exec","args":"playerctl previous","comment":"","category":"AUDIO CONTROLS ───"},{"mods":"SUPER","key":"left","dispatcher":"movefocus","args":"l","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"right","dispatcher":"movefocus","args":"r","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"up","dispatcher":"movefocus","args":"u","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"down","dispatcher":"movefocus","args":"d","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"h","dispatcher":"movefocus","args":"l","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"l","dispatcher":"movefocus","args":"r","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"k","dispatcher":"movefocus","args":"u","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SUPER","key":"j","dispatcher":"movefocus","args":"d","comment":"","category":"WINDOW FOCUS ───"},{"mods":"SHIFT+SUPER","key":"left","dispatcher":"movewindow","args":"l","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"right","dispatcher":"movewindow","args":"r","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"up","dispatcher":"movewindow","args":"u","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"down","dispatcher":"movewindow","args":"d","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"h","dispatcher":"movewindow","args":"l","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"l","dispatcher":"movewindow","args":"r","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"k","dispatcher":"movewindow","args":"u","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"SHIFT+SUPER","key":"j","dispatcher":"movewindow","args":"d","comment":"","category":"WINDOW MOVEMENT ───"},{"mods":"CTRL+SUPER","key":"left","dispatcher":"resizeactive","args":"-50 0","comment":"","category":"WINDOW RESIZING ───"},{"mods":"CTRL+SUPER","key":"right","dispatcher":"resizeactive","args":"50 0","comment":"","category":"WINDOW RESIZING ───"},{"mods":"CTRL+SUPER","key":"up","dispatcher":"resizeactive","args":"0 -50","comment":"","category":"WINDOW RESIZING ───"},{"mods":"CTRL+SUPER","key":"down","dispatcher":"resizeactive","args":"0 50","comment":"","category":"WINDOW RESIZING ───"},{"mods":"CTRL+SUPER","key":"k","dispatcher":"resizeactive","args":"0 -50","comment":"","category":"WINDOW RESIZING ───"},{"mods":"CTRL+SUPER","key":"j","dispatcher":"resizeactive","args":"0 50","comment":"","category":"WINDOW RESIZING ───"},{"mods":"ALT+SUPER","key":"equal","dispatcher":"exec","args":"hyprctl keyword decoration:active_opacity $(echo $(hyprctl getoption decoration:active_opacity -j | jq -r .float) + 0.05 | bc)","comment":"","category":"TRANSPARENCY CONTROLS ───"},{"mods":"ALT+SUPER","key":"minus","dispatcher":"exec","args":"hyprctl keyword decoration:active_opacity $(echo $(hyprctl getoption decoration:active_opacity -j | jq -r .float) - 0.05 | bc)","comment":"","category":"TRANSPARENCY CONTROLS ───"},{"mods":"ALT+SUPER","key":"0","dispatcher":"exec","args":"hyprctl keyword decoration:active_opacity 1.0 && hyprctl keyword decoration:inactive_opacity 1.0","comment":"","category":"TRANSPARENCY CONTROLS ───"},{"mods":"SUPER","key":"1","dispatcher":"workspace","args":"1","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"2","dispatcher":"workspace","args":"2","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"3","dispatcher":"workspace","args":"3","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"4","dispatcher":"workspace","args":"4","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"5","dispatcher":"workspace","args":"5","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"6","dispatcher":"workspace","args":"6","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"7","dispatcher":"workspace","args":"7","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"8","dispatcher":"workspace","args":"8","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"9","dispatcher":"workspace","args":"9","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"1","dispatcher":"movetoworkspace","args":"1","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"2","dispatcher":"movetoworkspace","args":"2","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"3","dispatcher":"movetoworkspace","args":"3","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"4","dispatcher":"movetoworkspace","args":"4","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"5","dispatcher":"movetoworkspace","args":"5","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"6","dispatcher":"movetoworkspace","args":"6","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"7","dispatcher":"movetoworkspace","args":"7","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"8","dispatcher":"movetoworkspace","args":"8","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"9","dispatcher":"movetoworkspace","args":"9","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"s","dispatcher":"togglespecialworkspace","args":"magic","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"s","dispatcher":"movetoworkspace","args":"special:magic","comment":"","category":"WORKSPACES ───"},{"mods":"SUPER","key":"grave","dispatcher":"togglespecialworkspace","args":"games","comment":"","category":"WORKSPACES ───"},{"mods":"SHIFT+SUPER","key":"grave","dispatcher":"movetoworkspace","args":"special:games","comment":"","category":"WORKSPACES ───"},{"mods":"ALT+SUPER","key":"right","dispatcher":"workspace","args":"e+1","comment":"","category":"WORKSPACE NAVIGATION ───"},{"mods":"ALT+SUPER","key":"left","dispatcher":"workspace","args":"e-1","comment":"","category":"WORKSPACE NAVIGATION ───"},{"mods":"SHIFT+SUPER","key":"q","dispatcher":"exec","args":"hyprctl dispatch exit","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SUPER","key":"l","dispatcher":"exec","args":"~/.local/bin/lock-and-sleep lock","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SUPER","key":"s","dispatcher":"exec","args":"~/.local/bin/lock-and-sleep sleep","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SUPER","key":"d","dispatcher":"exec","args":"~/.local/bin/lock-and-sleep display-off","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SHIFT+SUPER","key":"s","dispatcher":"exec","args":"systemctl poweroff","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SHIFT+SUPER","key":"r","dispatcher":"exec","args":"systemctl reboot","comment":"","category":"POWER & SESSION ───"},{"mods":"CTRL+SUPER","key":"p","dispatcher":"exec","args":"~/.local/bin/power-status","comment":"","category":"POWER & SESSION ───"},{"mods":"SUPER","key":"w","dispatcher":"exec","args":"~/.config/hypr/scripts/theme-switcher.sh","comment":"Theme switcher menu","category":"WALLPAPER CONTROLS ───"},{"mods":"SHIFT+SUPER","key":"w","dispatcher":"exec","args":"~/.local/bin/quick-wallpaper","comment":"Quick wallpaper picker","category":"WALLPAPER CONTROLS ───"},{"mods":"ALT+SUPER","key":"w","dispatcher":"exec","args":"~/.local/bin/wallpaper-manager next slide","comment":"","category":"WALLPAPER CONTROLS ───"},{"mods":"CTRL+SUPER","key":"w","dispatcher":"exec","args":"~/.local/bin/wallpaper-manager status","comment":"","category":"WALLPAPER CONTROLS ───"},{"mods":"SHIFT+SUPER","key":"r","dispatcher":"exec","args":"hyprctl reload","comment":"","category":"HYPRLAND CONTROLS ───"},{"mods":"ALT+SUPER","key":"r","dispatcher":"exec","args":"killall quickshell; quickshell &","comment":"","category":"HYPRLAND CONTROLS ───"},{"mods":"SUPER","key":"n","dispatcher":"exec","args":"dunstctl close","comment":"","category":"NOTIFICATION CONTROLS ───"},{"mods":"SHIFT+SUPER","key":"n","dispatcher":"exec","args":"dunstctl close-all","comment":"","category":"NOTIFICATION CONTROLS ───"},{"mods":"CTRL+SUPER","key":"n","dispatcher":"exec","args":"dunstctl history-pop","comment":"","category":"NOTIFICATION CONTROLS ───"},{"mods":"ALT+SUPER","key":"n","dispatcher":"exec","args":"~/.local/bin/quicknote","comment":"Quick note capture","category":"NOTIFICATION CONTROLS ───"},{"mods":"ALT+CTRL","key":"delete","dispatcher":"exec","args":"hyprctl dispatch exit","comment":"","category":"NOTIFICATION CONTROLS ───"},{"mods":"","key":"f12","dispatcher":"togglespecialworkspace","args":"dropdown","comment":"","category":"NOTIFICATION CONTROLS ───"},{"mods":"SHIFT+SUPER","key":"v","dispatcher":"exec","args":"cliphist list | fuzzel -d | cliphist decode | wl-copy","comment":"","category":"NOTIFICATION CONTROLS ───"}];
+
+// ── Humanize ──
+function humanize(b) {
+  if (b.comment) return b.comment;
+  const d = b.dispatcher, a = b.args;
+  const dirs = {l:'Left',r:'Right',u:'Up',d:'Down'};
+  switch (d) {
+    case 'killactive': return 'Close Window';
+    case 'exit': return 'Exit Hyprland';
+    case 'togglefloating': return 'Toggle Floating';
+    case 'pseudo': return 'Pseudo Tile';
+    case 'togglesplit': return 'Toggle Split';
+    case 'centerwindow': return 'Center Window';
+    case 'cyclenext': return a === 'prev' ? 'Previous Window' : 'Next Window';
+    case 'fullscreen': return a === '0' ? 'True Fullscreen' : 'Maximize';
+    case 'movefocus': return 'Focus ' + (dirs[a]||a);
+    case 'movewindow': return 'Move ' + (dirs[a]||a);
+    case 'resizeactive': { const [x,y]=a.split(/[, ]+/); return y==='0'?(parseInt(x)<0?'Shrink Width':'Grow Width'):(parseInt(y)<0?'Shrink Height':'Grow Height'); }
+    case 'workspace': return /^\d+$/.test(a)?'Workspace '+a:a==='e+1'?'Next Workspace':a==='e-1'?'Prev Workspace':'Workspace '+a;
+    case 'movetoworkspace': return /^\d+$/.test(a)?'Move → WS '+a:a.startsWith('special:')?'Move → '+a.replace('special:','').replace(/^\w/,c=>c.toUpperCase()):'Move → '+a;
+    case 'togglespecialworkspace': return 'Toggle '+a.replace(/^\w/,c=>c.toUpperCase());
+    case 'exec': {
+      let c = a.trim();
+      if (c.includes('/')) { let n=c.split('/').pop().replace(/\.sh$/,''); return n.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '); }
+      const m = {fuzzel:'App Launcher',steam:'Steam',lutris:'Lutris',code:'VS Code',librewolf:'LibreWolf',brave:'Brave',thunar:'File Manager',kitty:'Terminal','nvidia-settings':'GPU Settings','hyprctl reload':'Reload Hyprland','hyprctl dispatch exit':'Exit Hyprland','dunstctl close':'Dismiss Notification','dunstctl close-all':'Dismiss All','dunstctl history-pop':'Notification History'};
+      for (const [k,v] of Object.entries(m)) if (c===k||c.startsWith(k+' ')) return v;
+      const km = c.match(/^kitty\s+-e\s+(\S+)/);
+      if (km) return km[1][0].toUpperCase()+km[1].slice(1)+' (Terminal)';
+      if (c.includes('pamixer -i')) return 'Volume Up'; if (c.includes('pamixer -d')) return 'Volume Down'; if (c.includes('pamixer -t')) return 'Toggle Mute';
+      if (c.includes('set-sink-volume')&&c.includes('-')) return 'Volume Down'; if (c.includes('set-sink-mute')) return 'Toggle Mute'; if (c.includes('set-source-mute')) return 'Toggle Mic Mute';
+      if (c.includes('playerctl play-pause')) return 'Play/Pause'; if (c.includes('playerctl next')) return 'Next Track'; if (c.includes('playerctl previous')) return 'Prev Track';
+      if (c.includes('grim')&&c.includes('slurp')&&c.includes('wl-copy')) return 'Region → Clipboard'; if (c.includes('grim')&&c.includes('slurp')) return 'Screenshot Region'; if (c.includes('grim')&&c.includes('wl-copy')) return 'Screen → Clipboard'; if (c.includes('grim')) return 'Screenshot';
+      if (c.includes('cliphist')) return 'Clipboard History';
+      if (c.includes('systemctl poweroff')) return 'Power Off'; if (c.includes('systemctl reboot')) return 'Reboot';
+      if (c.includes('killall quickshell')) return 'Reload Quickshell';
+      if (c.includes('active_opacity')&&c.includes('+ 0.05')) return 'More Opaque'; if (c.includes('active_opacity')&&c.includes('- 0.05')) return 'Less Opaque'; if (c.includes('active_opacity')&&c.includes('1.0')) return 'Reset Opacity';
+      return c.length>35?c.substring(0,32)+'...':c;
+    }
+    default: return a?d+' '+a:d;
+  }
+}
+
+const MOD_COLORS = {'SUPER':'var(--mod-super)','SHIFT+SUPER':'var(--mod-super-shift)','CTRL+SUPER':'var(--mod-super-ctrl)','ALT+SUPER':'var(--mod-super-alt)','CTRL':'var(--mod-ctrl)','ALT+CTRL':'var(--mod-ctrl-alt)','ALT+SHIFT+SUPER':'var(--mod-super-alt-shift)','CTRL+SHIFT+SUPER':'var(--mod-super-ctrl-shift)','':'var(--mod-bare)'};
+const MOD_LABELS = {'SUPER':'Super','SHIFT+SUPER':'Super+Shift','CTRL+SUPER':'Super+Ctrl','ALT+SUPER':'Super+Alt','CTRL':'Ctrl','ALT+CTRL':'Ctrl+Alt','ALT+SHIFT+SUPER':'Super+Alt+Shift','CTRL+SHIFT+SUPER':'Super+Ctrl+Shift','':'No Modifier'};
+
+const BINDINGS = RAW_BINDINGS.map(b => ({...b, desc: humanize(b)}));
+
+// ── K100 Layout ──
+const U = 40, G = 3;
+
+const MAIN_ROWS = [
+  [['escape','Esc',1],['_g',0.5],['f1','F1',1],['f2','F2',1],['f3','F3',1],['f4','F4',1],['_g',0.25],['f5','F5',1],['f6','F6',1],['f7','F7',1],['f8','F8',1],['_g',0.25],['f9','F9',1],['f10','F10',1],['f11','F11',1],['f12','F12',1]],
+  [['grave','`',1],['1','1',1],['2','2',1],['3','3',1],['4','4',1],['5','5',1],['6','6',1],['7','7',1],['8','8',1],['9','9',1],['0','0',1],['minus','–',1],['equal','=',1],['backspace','Bksp',2]],
+  [['tab','Tab',1.5],['q','Q',1],['w','W',1],['e','E',1],['r','R',1],['t','T',1],['y','Y',1],['u','U',1],['i','I',1],['o','O',1],['p','P',1],['bracketleft','[',1],['bracketright',']',1],['backslash','\\',1.5]],
+  [['caps_lock','Caps',1.75],['a','A',1],['s','S',1],['d','D',1],['f','F',1],['g','G',1],['h','H',1],['j','J',1],['k','K',1],['l','L',1],['semicolon',';',1],['apostrophe',"'",1],['return','Enter',2.25]],
+  [['shift_l','Shift',2.25],['z','Z',1],['x','X',1],['c','C',1],['v','V',1],['b','B',1],['n','N',1],['m','M',1],['comma',',',1],['period','.',1],['slash','/',1],['shift_r','Shift',2.75]],
+  [['control_l','Ctrl',1.25],['super_l','Super',1.25],['alt_l','Alt',1.25],['space','',6.25],['alt_r','Alt',1.25],['super_r','Super',1.25],['menu','Fn',1.25],['control_r','Ctrl',1.25]],
+];
+
+const NAV_GRID = [
+  [['print','PrtSc'],['scroll_lock','ScrLk'],['pause','Pause']],
+  [['insert','Ins'],['home','Home'],['pageup','PgUp']],
+  [['delete','Del'],['end','End'],['pagedown','PgDn']],
+  [null,null,null],
+  [null,['up','\u25B2'],null],
+  [['left','\u25C0'],['down','\u25BC'],['right','\u25B6']],
+];
+
+const MACROS = [['g1','G1'],['g2','G2'],['g3','G3'],['g4','G4'],['g5','G5'],['g6','G6']];
+
+const NUMPAD = [
+  {id:'numlock',l:'Num',r:1,c:1},{id:'kp_divide',l:'/',r:1,c:2},{id:'kp_multiply',l:'*',r:1,c:3},{id:'kp_subtract',l:'–',r:1,c:4},
+  {id:'kp_7',l:'7',r:2,c:1},{id:'kp_8',l:'8',r:2,c:2},{id:'kp_9',l:'9',r:2,c:3},{id:'kp_add',l:'+',r:2,c:4,rs:2},
+  {id:'kp_4',l:'4',r:3,c:1},{id:'kp_5',l:'5',r:3,c:2},{id:'kp_6',l:'6',r:3,c:3},
+  {id:'kp_1',l:'1',r:4,c:1},{id:'kp_2',l:'2',r:4,c:2},{id:'kp_3',l:'3',r:4,c:3},{id:'kp_enter',l:'Ent',r:4,c:4,rs:2},
+  {id:'kp_0',l:'0',r:5,c:1,cs:2},{id:'kp_decimal',l:'.',r:5,c:3},
+];
+
+const KEY_ALIASES = {
+  'return':'return','enter':'return','space':'space','tab':'tab','print':'print','delete':'delete',
+  'backspace':'backspace','escape':'escape','left':'left','right':'right','up':'up','down':'down',
+  'grave':'grave','minus':'minus','equal':'equal','backslash':'backslash','slash':'slash',
+  'comma':'comma','period':'period','semicolon':'semicolon','apostrophe':'apostrophe',
+  'bracketleft':'bracketleft','bracketright':'bracketright','caps_lock':'caps_lock',
+  'home':'home','end':'end','pageup':'pageup','pagedown':'pagedown','insert':'insert',
+  'menu':'menu','pause':'pause','scroll_lock':'scroll_lock',
+  'numlock':'numlock','kp_divide':'kp_divide','kp_multiply':'kp_multiply','kp_subtract':'kp_subtract',
+  'kp_add':'kp_add','kp_enter':'kp_enter','kp_decimal':'kp_decimal',
+};
+'abcdefghijklmnopqrstuvwxyz'.split('').forEach(c => KEY_ALIASES[c]=c);
+'0123456789'.split('').forEach(c => KEY_ALIASES[c]=c);
+for (let i=1;i<=12;i++) KEY_ALIASES['f'+i]='f'+i;
+for (let i=0;i<=9;i++) KEY_ALIASES['kp_'+i]='kp_'+i;
+MACROS.forEach(([id])=> KEY_ALIASES[id]=id);
+
+// ── Data maps ──
+const bindMap = {}, mediaBinds = [], allMods = new Set(), allCats = new Set();
+BINDINGS.forEach(b => {
+  const kid = KEY_ALIASES[b.key];
+  if (!kid) { mediaBinds.push(b); return; }
+  if (!bindMap[kid]) bindMap[kid] = [];
+  bindMap[kid].push(b);
+  allMods.add(b.mods);
+  allCats.add(b.category);
+});
+
+// ── Conflict detection ──
+const conflicts = {};
+Object.entries(bindMap).forEach(([kid, binds]) => {
+  const modCounts = {};
+  binds.forEach(b => { modCounts[b.mods] = (modCounts[b.mods]||0)+1; });
+  const dupes = Object.entries(modCounts).filter(([,c]) => c > 1).map(([m]) => m);
+  if (dupes.length) conflicts[kid] = dupes;
+});
+
+// ── State ──
+let filterMod = null, filterCat = null, searchQuery = '', selectedKey = null;
+let activeView = 'keyboard'; // 'keyboard' | 'cheatsheet'
+let modHeldPrev = null; // previous filterMod before physical mod held
+const keyEls = {};
+
+// ── localStorage persistence ──
+const LS_KEY = 'keybind-legend-state';
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_KEY));
+    if (!s) return;
+    if (s.filterMod !== undefined) filterMod = s.filterMod;
+    if (s.filterCat !== undefined) filterCat = s.filterCat;
+    if (s.searchQuery) { searchQuery = s.searchQuery; document.getElementById('search').value = s.searchQuery; }
+    if (s.showPreviews === false) { document.getElementById('optPreviews').checked = false; document.body.classList.add('hide-previews'); }
+    if (s.showGlow === false) { document.getElementById('optGlow').checked = false; document.body.classList.add('hide-glow'); }
+    if (s.activeView === 'cheatsheet') { activeView = 'cheatsheet'; }
+  } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      filterMod, filterCat, searchQuery,
+      showPreviews: document.getElementById('optPreviews').checked,
+      showGlow: document.getElementById('optGlow').checked,
+      activeView
+    }));
+  } catch(e) {}
+}
+
+// ── Helper: create key element ──
+function mkKey(id, label, w, h, extra) {
+  const key = document.createElement('div');
+  key.className = 'key' + (extra||'');
+  key.style.width = w ? (w*U + Math.max(0,Math.floor((w-1)*G))) + 'px' : '';
+  if (h) key.style.height = (h*U + Math.max(0,Math.floor((h-1)*G))) + 'px';
+  key.dataset.id = id;
+  key.setAttribute('tabindex', '0');
+  const lbl = document.createElement('div'); lbl.className='label'; lbl.textContent=label; key.appendChild(lbl);
+  const bp = document.createElement('div'); bp.className='binding-preview'; key.appendChild(bp);
+  const dots = document.createElement('div'); dots.className='multi-dots'; key.appendChild(dots);
+  keyEls[id] = key;
+  key.addEventListener('click', () => selectKey(id));
+  key.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); selectKey(id); } });
+  // Hover tooltip
+  key.addEventListener('mouseenter', e => showHoverTip(id, e));
+  key.addEventListener('mousemove', e => moveHoverTip(e));
+  key.addEventListener('mouseleave', () => hideHoverTip());
+  return key;
+}
+
+function mkGap(w) { const g=document.createElement('div'); g.className='kb-gap'; g.style.width=(w*U+Math.max(0,(w-1))*G)+'px'; return g; }
+
+// ── Hover tooltip ──
+const hoverTip = document.getElementById('hoverTip');
+function showHoverTip(id, e) {
+  const binds = bindMap[id];
+  if (!binds || !binds.length) return;
+  const vis = getVisible(id);
+  const list = (vis.length ? vis : binds).slice(0, 5);
+  hoverTip.textContent = list.map(b => {
+    const mod = b.mods ? (MOD_LABELS[b.mods]||b.mods)+' + ' : '';
+    return mod + b.desc;
+  }).join('\n');
+  if (list.length < (vis.length||binds.length)) hoverTip.textContent += '\n+' + ((vis.length||binds.length) - list.length) + ' more';
+  positionHoverTip(e);
+  hoverTip.classList.add('visible');
+}
+function moveHoverTip(e) { positionHoverTip(e); }
+function positionHoverTip(e) {
+  const tipW = hoverTip.offsetWidth, tipH = hoverTip.offsetHeight;
+  let x = e.clientX + 12, y = e.clientY - tipH - 8;
+  if (x + tipW > window.innerWidth - 8) x = e.clientX - tipW - 12;
+  if (y < 8) y = e.clientY + 20;
+  hoverTip.style.left = x + 'px';
+  hoverTip.style.top = y + 'px';
+}
+function hideHoverTip() { hoverTip.classList.remove('visible'); }
+
+// ── Build K100 keyboard ──
+const bezelEl = document.getElementById('bezel');
+const bodyEl = document.getElementById('kbBody');
+
+bezelEl.innerHTML = '<div class="bezel-left"><div class="bezel-btn" title="Profile Switch">&#xf0004;</div><div class="icue-wheel" title="iCUE Control Wheel"></div><div class="bezel-btn" title="Windows Lock">&#xf033e;</div></div><div class="bezel-right"><div class="bezel-right-top"><div class="mute-btn" title="Mute">&#xf075f;</div><div class="vol-roller" title="Volume Roller"></div></div><div class="bezel-right-bottom"><div class="media-btn" title="Stop">&#xf04db;</div><div class="media-btn" title="Previous Track">&#xf04ae;</div><div class="media-btn" title="Play / Pause">&#xf040e;</div><div class="media-btn" title="Next Track">&#xf04ad;</div></div></div>';
+
+const leftSection = document.createElement('div'); leftSection.className='kb-left';
+const macroCol = document.createElement('div'); macroCol.className='kb-macros';
+MACROS.forEach(([id,label]) => macroCol.appendChild(mkKey(id,label,1,1,' macro')));
+leftSection.appendChild(macroCol);
+bodyEl.appendChild(leftSection);
+
+const centerSection = document.createElement('div'); centerSection.className='kb-center';
+MAIN_ROWS.forEach(row => {
+  const rowEl = document.createElement('div'); rowEl.className='kb-row';
+  row.forEach(([id,label,w]) => {
+    if (id==='_g') { rowEl.appendChild(mkGap(w)); return; }
+    rowEl.appendChild(mkKey(id,label,w));
+  });
+  centerSection.appendChild(rowEl);
+});
+bodyEl.appendChild(centerSection);
+
+const navSection = document.createElement('div'); navSection.className='kb-nav';
+NAV_GRID.forEach((row, ri) => {
+  row.forEach((k, ci) => {
+    if (!k) return;
+    const key = mkKey(k[0], k[1], 1);
+    key.style.gridRow = String(ri+1);
+    key.style.gridColumn = String(ci+1);
+    key.style.width = 'auto';
+    navSection.appendChild(key);
+  });
+});
+bodyEl.appendChild(navSection);
+
+const rightSection = document.createElement('div'); rightSection.className='kb-right';
+const npSpacer = document.createElement('div'); npSpacer.className='numpad-spacer'; rightSection.appendChild(npSpacer);
+const numpadEl = document.createElement('div'); numpadEl.className='kb-numpad';
+NUMPAD.forEach(k => {
+  const key = mkKey(k.id, k.l, k.cs||1, k.rs||1);
+  key.style.gridRow = k.rs ? k.r+' / span '+k.rs : String(k.r);
+  key.style.gridColumn = k.cs ? k.c+' / span '+k.cs : String(k.c);
+  if (k.rs||k.cs) { key.style.width='auto'; key.style.height='auto'; }
+  numpadEl.appendChild(key);
+});
+rightSection.appendChild(numpadEl);
+bodyEl.appendChild(rightSection);
+
+// ── Viewport scaling ──
+const scaler = document.getElementById('keyboardScaler');
+function scaleKeyboard() {
+  scaler.style.transform = '';
+  const wrap = scaler.parentElement;
+  const kbW = scaler.scrollWidth;
+  const wrapW = wrap.clientWidth;
+  if (kbW > wrapW) {
+    scaler.style.transform = 'scale(' + (wrapW / kbW) + ')';
+  }
+}
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(scaleKeyboard, 60); });
+
+// ── Chips ──
+const modChips=document.getElementById('modChips'), catChips=document.getElementById('catChips');
+const modOrder=['SUPER','SHIFT+SUPER','CTRL+SUPER','ALT+SUPER','ALT+SHIFT+SUPER','CTRL+SHIFT+SUPER','CTRL','ALT+CTRL',''];
+const activeMods=modOrder.filter(m=>allMods.has(m));
+
+function mkChip(text,color,active,count){
+  const el=document.createElement('button'); el.className='chip'+(active?' active':'');
+  if(active) el.style.background=color;
+  el.innerHTML=text;
+  if(count!==undefined){const c=document.createElement('span');c.className='count';c.textContent=count;el.appendChild(c);}
+  return el;
+}
+
+function buildModChips(){
+  modChips.innerHTML='';
+  const a=mkChip('All','var(--fg)',filterMod===null); a.onclick=()=>{filterMod=null;refresh();}; modChips.appendChild(a);
+  activeMods.forEach(mod=>{
+    const color=MOD_COLORS[mod]||'var(--fg-dim)', label=MOD_LABELS[mod]||mod||'Bare';
+    const count=BINDINGS.filter(b=>b.mods===mod&&KEY_ALIASES[b.key]).length;
+    const chip=mkChip(' '+label+' ',color,filterMod===mod,count);
+    const dot=document.createElement('span');dot.className='dot';dot.style.background=color;chip.prepend(dot);
+    chip.onclick=()=>{filterMod=filterMod===mod?null:mod;refresh();};
+    modChips.appendChild(chip);
+  });
+}
+
+function buildCatChips(){
+  catChips.innerHTML='';
+  const a=mkChip('All','var(--fg)',filterCat===null); a.onclick=()=>{filterCat=null;refresh();}; catChips.appendChild(a);
+  [...allCats].forEach(cat=>{
+    const count=BINDINGS.filter(b=>b.category===cat&&KEY_ALIASES[b.key]).length;
+    if(!count) return;
+    const chip=mkChip(cat,'var(--accent)',filterCat===cat,count);
+    chip.onclick=()=>{filterCat=filterCat===cat?null:cat;refresh();};
+    catChips.appendChild(chip);
+  });
+}
+
+// ── Keyboard update ──
+function getVisible(kid){ const b=bindMap[kid]; if(!b)return[]; return b.filter(b=>{if(filterMod!==null&&b.mods!==filterMod)return false;if(filterCat!==null&&b.category!==filterCat)return false;if(searchQuery&&!b.desc.toLowerCase().includes(searchQuery)&&!b.category.toLowerCase().includes(searchQuery)&&!(MOD_LABELS[b.mods]||'').toLowerCase().includes(searchQuery))return false;return true;}); }
+
+function updateKeyboard(){
+  Object.entries(keyEls).forEach(([id,el])=>{
+    const vis=getVisible(id), all=bindMap[id]||[];
+    el.classList.remove('bound','dimmed'); el.querySelector('.binding-preview').textContent=''; el.style.removeProperty('--bind-color'); el.querySelector('.multi-dots').innerHTML='';
+    // Remove old conflict dots
+    const oldDot = el.querySelector('.conflict-dot');
+    if (oldDot) oldDot.remove();
+    if(!vis.length){ if(all.length&&(filterMod!==null||filterCat!==null||searchQuery))el.classList.add('dimmed'); return; }
+    el.classList.add('bound');
+    const color=MOD_COLORS[vis[0].mods]||'var(--fg-dim)'; el.style.setProperty('--bind-color',color);
+    const bp=el.querySelector('.binding-preview'), desc=vis[0].desc, maxL=Math.floor(parseFloat(el.style.width||U)/4.5);
+    bp.textContent=desc.length>maxL?desc.slice(0,maxL-1)+'…':desc;
+    if(vis.length>1){ const dotsEl=el.querySelector('.multi-dots'); vis.slice(0,4).forEach(b=>{const d=document.createElement('div');d.className='md';d.style.background=MOD_COLORS[b.mods]||'var(--fg-dim)';dotsEl.appendChild(d);}); }
+    // Conflict dot
+    if (conflicts[id]) {
+      const cd = document.createElement('div'); cd.className='conflict-dot'; el.appendChild(cd);
+    }
+  });
+}
+
+function refresh(){ buildModChips(); buildCatChips(); updateKeyboard(); if(selectedKey)showDetail(selectedKey); saveState(); }
+
+// ── Detail panel ──
+const panel=document.getElementById('detailPanel');
+function selectKey(id){
+  const el = keyEls[id];
+  // Press animation
+  el.classList.add('pressed');
+  setTimeout(() => el.classList.remove('pressed'), 150);
+
+  Object.values(keyEls).forEach(e=>e.classList.remove('selected'));
+  if(selectedKey===id){selectedKey=null;panel.className='detail-panel empty';panel.innerHTML='<div class="dp-hint">Click a key to inspect its bindings</div>';return;}
+  selectedKey=id; el.classList.add('selected'); showDetail(id);
+}
+
+function showDetail(id){
+  const all=bindMap[id]||[], vis=getVisible(id), label=keyEls[id].querySelector('.label').textContent;
+  if(!all.length){panel.className='detail-panel empty';panel.innerHTML='<div class="dp-hint">No bindings on this key</div>';return;}
+  panel.className='detail-panel'; panel.innerHTML='';
+  const n=document.createElement('div');n.className='dp-key-name';n.textContent=label;panel.appendChild(n);
+  const s=document.createElement('div');s.className='dp-key-sub';s.textContent=all.length+' binding'+(all.length>1?'s':'')+(vis.length<all.length?' · '+vis.length+' shown':'');panel.appendChild(s);
+  all.forEach(b=>{
+    const isVis=vis.includes(b), e=document.createElement('div');e.className='dp-binding';
+    const color=MOD_COLORS[b.mods]||'var(--fg-dim)';e.style.setProperty('--entry-color',color);if(!isVis)e.style.opacity='0.3';
+    const modLabel = MOD_LABELS[b.mods]||b.mods||'No Modifier';
+    e.innerHTML='<div class="dp-mod" style="color:'+color+'">'+modLabel+'</div><div class="dp-desc">'+b.desc+'</div><div class="dp-category">'+b.category+'</div>';
+    // Copy button
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'dp-copy';
+    copyBtn.innerHTML = '⧉';
+    copyBtn.title = 'Copy bind line';
+    copyBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      const keyName = keyEls[id].querySelector('.label').textContent.toLowerCase();
+      const line = 'bind = ' + (b.mods||'') + ', ' + keyName + ', ' + b.dispatcher + (b.args ? ', ' + b.args : '');
+      navigator.clipboard.writeText(line).then(() => {
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = '✓';
+        setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.innerHTML = '⧉'; }, 1500);
+      });
+    });
+    e.appendChild(copyBtn);
+    panel.appendChild(e);
+  });
+}
+
+// ── Search ──
+document.getElementById('search').addEventListener('input',e=>{
+  searchQuery=e.target.value.toLowerCase().trim();
+  selectedKey=null; Object.values(keyEls).forEach(el=>el.classList.remove('selected'));
+  panel.className='detail-panel empty'; panel.innerHTML='<div class="dp-hint">Click a key to inspect its bindings</div>';
+  updateKeyboard();
+  saveState();
+});
+
+// ── Keyboard navigation ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && selectedKey) {
+    Object.values(keyEls).forEach(el=>el.classList.remove('selected'));
+    selectedKey=null;
+    panel.className='detail-panel empty';
+    panel.innerHTML='<div class="dp-hint">Click a key to inspect its bindings</div>';
+  }
+});
+
+// ── Settings ──
+document.getElementById('settingsBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('settingsMenu').classList.toggle('open');
+});
+document.addEventListener('click',()=>document.getElementById('settingsMenu').classList.remove('open'));
+document.getElementById('settingsMenu').addEventListener('click',e=>e.stopPropagation());
+document.getElementById('optPreviews').addEventListener('change',e=>{document.body.classList.toggle('hide-previews',!e.target.checked);saveState();});
+document.getElementById('optGlow').addEventListener('change',e=>{document.body.classList.toggle('hide-glow',!e.target.checked);saveState();});
+
+// ── Live modifier detection ──
+const modIndicator = document.getElementById('modIndicator');
+const heldMods = new Set();
+const KEY_TO_MOD = {'Control':'CTRL','Shift':'SHIFT','Alt':'ALT','Meta':'SUPER'};
+
+function updateModHeld() {
+  const parts = [];
+  if (heldMods.has('CTRL')) parts.push('CTRL');
+  if (heldMods.has('ALT')) parts.push('ALT');
+  if (heldMods.has('SHIFT')) parts.push('SHIFT');
+  if (heldMods.has('SUPER')) parts.push('SUPER');
+  if (!parts.length) {
+    if (modHeldPrev !== null) { filterMod = modHeldPrev; modHeldPrev = null; refresh(); }
+    modIndicator.classList.remove('visible');
+    return;
+  }
+  const combo = parts.join('+');
+  modIndicator.textContent = parts.map(p => p[0]+p.slice(1).toLowerCase()).join(' + ') + ' held';
+  modIndicator.classList.add('visible');
+  if (modHeldPrev === null) modHeldPrev = filterMod;
+  filterMod = allMods.has(combo) ? combo : null;
+  refresh();
+}
+
+document.addEventListener('keydown', e => {
+  const mod = KEY_TO_MOD[e.key];
+  if (mod && !heldMods.has(mod)) { heldMods.add(mod); updateModHeld(); }
+});
+document.addEventListener('keyup', e => {
+  const mod = KEY_TO_MOD[e.key];
+  if (mod) { heldMods.delete(mod); updateModHeld(); }
+});
+window.addEventListener('blur', () => { heldMods.clear(); updateModHeld(); });
+
+// ── Media keys ──
+if(mediaBinds.length){
+  const sec=document.getElementById('mediaSection');
+  sec.innerHTML='<h2>Media & Special Keys</h2>';
+  const grid=document.createElement('div');grid.className='media-grid';
+  mediaBinds.forEach(b=>{
+    const item=document.createElement('div');item.className='media-item';
+    const modStr=b.mods?(MOD_LABELS[b.mods]||b.mods)+' + ':'';
+    const keyLabel=b.key.replace(/^xf86audio/i,'').replace(/^xf86/i,'');
+    item.innerHTML='<span class="mi-key" style="color:'+(MOD_COLORS[b.mods]||'var(--mod-bare)')+'">'+modStr+keyLabel+'</span><span class="mi-desc">'+b.desc+'</span>';
+    grid.appendChild(item);
+  });
+  sec.appendChild(grid);
+}
+
+// ── Stats bar ──
+function buildStats() {
+  const totalPhysical = Object.keys(keyEls).length;
+  const boundKeys = Object.keys(bindMap).length;
+  const totalBindings = BINDINGS.filter(b => KEY_ALIASES[b.key]).length;
+  const conflictCount = Object.keys(conflicts).length;
+  // Most-used modifier
+  const modCounts = {};
+  BINDINGS.forEach(b => { if (KEY_ALIASES[b.key]) modCounts[b.mods] = (modCounts[b.mods]||0)+1; });
+  let topMod = '', topModCount = 0;
+  Object.entries(modCounts).forEach(([m,c]) => { if(c>topModCount){topMod=m;topModCount=c;} });
+  const bar = document.getElementById('statsBar');
+  bar.innerHTML =
+    '<span class="stat"><span class="stat-val">'+totalBindings+'</span> binds</span>' +
+    '<span class="stat"><span class="stat-val">'+Math.round(100*boundKeys/totalPhysical)+'%</span> coverage</span>' +
+    '<span class="stat">top: <span class="stat-val">'+(MOD_LABELS[topMod]||'None')+'</span></span>' +
+    (conflictCount ? '<span class="stat"><span class="stat-val stat-conflict">'+conflictCount+'</span> conflicts</span>' : '');
+}
+
+// ── Cheat sheet ──
+function buildCheatSheet() {
+  const cs = document.getElementById('cheatSheet');
+  cs.innerHTML = '';
+  const catMap = {};
+  BINDINGS.forEach(b => {
+    if (!KEY_ALIASES[b.key]) return;
+    if (!catMap[b.category]) catMap[b.category] = [];
+    catMap[b.category].push(b);
+  });
+  Object.entries(catMap).forEach(([cat, binds]) => {
+    const sec = document.createElement('div'); sec.className='cs-category';
+    const h = document.createElement('h3'); h.textContent=cat; sec.appendChild(h);
+    binds.forEach(b => {
+      const row = document.createElement('div'); row.className='cs-item';
+      const modStr = b.mods ? (MOD_LABELS[b.mods]||b.mods)+' + ' : '';
+      row.innerHTML = '<span class="cs-keys" style="color:'+(MOD_COLORS[b.mods]||'var(--mod-bare)')+'">'+modStr+b.key.toUpperCase()+'</span><span class="cs-desc">'+b.desc+'</span>';
+      sec.appendChild(row);
+    });
+    cs.appendChild(sec);
+  });
+}
+
+// ── View toggle ──
+const viewToggle = document.getElementById('viewToggle');
+const mainView = document.getElementById('mainView');
+const cheatSheet = document.getElementById('cheatSheet');
+
+function applyView() {
+  if (activeView === 'cheatsheet') {
+    mainView.style.display = 'none';
+    cheatSheet.style.display = '';
+    viewToggle.textContent = 'Keyboard View';
+    viewToggle.classList.add('active');
+    buildCheatSheet();
+  } else {
+    mainView.style.display = '';
+    cheatSheet.style.display = 'none';
+    viewToggle.textContent = 'List View';
+    viewToggle.classList.remove('active');
+    setTimeout(scaleKeyboard, 10);
+  }
+}
+
+viewToggle.addEventListener('click', () => {
+  activeView = activeView === 'keyboard' ? 'cheatsheet' : 'keyboard';
+  applyView();
+  saveState();
+});
+
+// ── Init ──
+loadState();
+applyView();
+buildStats();
+refresh();
+setTimeout(scaleKeyboard, 50);
+</script>
+</body>
+</html>
